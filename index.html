@@ -1,373 +1,71 @@
 <!doctype html>
 <html lang="da">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#6b1f7b" />
-  <title>FDF Arnborg Præmiejagt</title>
-  <style>
-    :root {
-      --bg: #f7f3fa;
-      --card: #ffffff;
-      --primary: #6b1f7b;
-      --primary-dark: #4d145a;
-      --accent: #f2b705;
-      --text: #211526;
-      --muted: #746878;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: linear-gradient(180deg, #efe4f3 0%, var(--bg) 55%);
-      color: var(--text);
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 18px;
-    }
-    .app {
-      width: min(720px, 100%);
-      background: rgba(255,255,255,.97);
-      border-radius: 28px;
-      box-shadow: 0 18px 55px rgba(59, 23, 67, .18);
-      overflow: hidden;
-    }
-    header {
-      background: var(--primary);
-      color: white;
-      padding: 24px 22px 20px;
-      text-align: center;
-    }
-    header h1 { margin: 0; font-size: clamp(1.8rem, 6vw, 3rem); }
-    header p { margin: 8px 0 0; opacity: .88; }
-    main { padding: 24px; }
-    .counter { text-align: center; margin-bottom: 18px; }
-    .label { color: var(--muted); font-weight: 800; }
-    .number {
-      font-size: clamp(4rem, 20vw, 8rem);
-      line-height: .95;
-      font-weight: 900;
-      color: var(--primary);
-      margin: 10px 0;
-    }
-    .sub { color: var(--muted); font-size: .95rem; }
-    .sale-btn {
-      width: 100%;
-      border: 0;
-      border-radius: 22px;
-      background: var(--accent);
-      color: #2d2100;
-      font-size: clamp(2rem, 9vw, 4rem);
-      font-weight: 900;
-      padding: 26px 14px;
-      min-height: 150px;
-      box-shadow: 0 10px 0 #c79400;
-      cursor: pointer;
-      touch-action: manipulation;
-      user-select: none;
-    }
-    .sale-btn:active {
-      transform: translateY(6px);
-      box-shadow: 0 4px 0 #c79400;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 22px;
-    }
-    .card {
-      background: #f8f5fa;
-      border: 1px solid #eadfed;
-      padding: 16px;
-      border-radius: 18px;
-    }
-    .card strong {
-      display: block;
-      font-size: 1.7rem;
-      color: var(--primary);
-      margin-top: 4px;
-    }
-    details {
-      margin-top: 18px;
-      padding-top: 16px;
-      border-top: 1px solid #eadfed;
-    }
-    summary { cursor: pointer; font-weight: 900; color: var(--primary); }
-    .settings-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 14px;
-    }
-    label { display: grid; gap: 6px; font-weight: 700; color: var(--muted); }
-    input {
-      width: 100%;
-      border: 1px solid #d9c9de;
-      border-radius: 12px;
-      padding: 12px;
-      font-size: 1rem;
-    }
-    .small-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
-    .small-buttons button {
-      border: 0;
-      border-radius: 12px;
-      padding: 11px 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .save { background: var(--primary); color: white; }
-    .reset { background: #efe7f2; color: var(--primary-dark); }
-    .winner {
-      position: fixed;
-      inset: 0;
-      display: none;
-      place-items: center;
-      z-index: 20;
-      background: radial-gradient(circle, #ffef8c 0%, #f2b705 40%, #d97b00 100%);
-      color: #321b00;
-      text-align: center;
-      padding: 24px;
-      overflow: hidden;
-    }
-    .winner.show { display: grid; }
-    .winner-box { position: relative; z-index: 3; animation: pop .45s ease-out; }
-    .winner h2 { margin: 0; font-size: clamp(4rem, 18vw, 10rem); line-height: .9; }
-    .winner p { font-size: clamp(1.6rem, 6vw, 3rem); font-weight: 900; margin: 22px 0; }
-    .winner button {
-      border: 0;
-      border-radius: 18px;
-      background: var(--primary);
-      color: white;
-      font-size: 1.25rem;
-      font-weight: 900;
-      padding: 16px 24px;
-      cursor: pointer;
-    }
-    .confetti {
-      position: fixed;
-      width: 12px;
-      height: 20px;
-      top: -30px;
-      z-index: 2;
-      animation: fall linear forwards;
-    }
-    @keyframes fall { to { transform: translateY(110vh) rotate(900deg); } }
-    @keyframes pop {
-      0% { transform: scale(.55); opacity: 0; }
-      70% { transform: scale(1.08); }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    footer {
-      text-align: center;
-      color: var(--muted);
-      font-size: .82rem;
-      padding: 0 20px 20px;
-    }
-    @media (max-width: 520px) {
-      main { padding: 18px; }
-      .grid, .settings-row { grid-template-columns: 1fr; }
-      .sale-btn { min-height: 130px; }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>FDF Præmiejagt</title>
+<style>
+:root{--black:#050505;--white:#fff;--grey:#ededed;--muted:#686868;--gold:#d2ad47}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#efefef;color:var(--black)}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;place-items:center;padding:14px}
+button,input,select{font:inherit}.app{width:min(760px,100%);background:#fff;border:3px solid #000;border-radius:28px;overflow:hidden;box-shadow:0 20px 55px #0002}
+header{background:#000;color:#fff;padding:18px 20px;display:flex;align-items:center;gap:16px}
+.logo{width:76px;height:76px;background:#fff;border-radius:18px;padding:8px;object-fit:contain}
+h1{margin:0;font-size:clamp(1.55rem,5vw,2.5rem);line-height:1}.tag{margin:7px 0 0;color:#ccc;font-weight:700}
+main{padding:22px}.hero{text-align:center;border:2px solid #000;border-radius:24px;padding:22px;background:linear-gradient(#fff,#f6f6f6)}
+.eyebrow{font-weight:900;letter-spacing:.13em;font-size:.8rem;color:var(--muted)}.count{font-size:clamp(5rem,22vw,10rem);font-weight:1000;line-height:.85;margin:18px 0 12px;letter-spacing:-.06em}.hint{color:var(--muted);font-weight:700}
+.sale{width:100%;min-height:170px;margin-top:18px;border:4px solid #000;border-radius:26px;background:#fff;font-size:clamp(2.1rem,10vw,4.4rem);font-weight:1000;box-shadow:0 10px 0 #000;cursor:pointer;touch-action:manipulation}
+.sale:active{transform:translateY(8px);box-shadow:0 2px 0 #000;background:#eee}
+.stats{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{border:2px solid #000;border-radius:18px;padding:16px}.stat span{display:block;color:var(--muted);font-weight:800;font-size:.85rem}.stat strong{display:block;font-size:1.8rem;margin-top:4px}
+.track{margin-top:18px;border:2px solid #000;border-radius:999px;overflow:hidden;height:16px}.bar{height:100%;width:0;background:#000;transition:.2s}.message{text-align:center;color:var(--muted);font-weight:700;margin-top:12px;min-height:1.4em}
+details{margin-top:22px;border-top:2px solid #000;padding-top:18px}summary{font-weight:1000;cursor:pointer}.settings{display:grid;gap:14px;margin-top:16px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:grid;gap:7px;color:var(--muted);font-weight:800;font-size:.92rem}input,select{width:100%;padding:13px;border:2px solid #000;border-radius:12px;background:#fff}
+.actions{display:flex;flex-wrap:wrap;gap:10px}.actions button{border:2px solid #000;border-radius:12px;padding:12px 14px;font-weight:900;background:#fff;cursor:pointer}.actions .primary{background:#000;color:#fff}.actions .danger{color:#a0001a;border-color:#a0001a}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 22px 22px}
+.winner{position:fixed;inset:0;display:none;place-items:center;z-index:50;background:#000;color:#fff;padding:22px;overflow:hidden}.winner.show{display:grid}.winner:before{content:"";position:absolute;inset:-40%;background:repeating-conic-gradient(#fff 0 8deg,#000 8deg 16deg);opacity:.12;animation:spin 8s linear infinite}
+.winbox{position:relative;z-index:2;width:min(700px,100%);text-align:center;border:4px solid #fff;border-radius:30px;padding:30px 22px;background:#000d;animation:pop .45s ease-out}.winbox img{width:110px;height:110px;object-fit:contain;background:#fff;border-radius:22px;padding:10px}.winner h2{font-size:clamp(3.2rem,15vw,8rem);line-height:.9;margin:22px 0 10px}.prize{font-size:clamp(1.5rem,6vw,3rem);font-weight:1000;margin:12px 0 24px}.winner button{border:3px solid #fff;border-radius:16px;background:#fff;color:#000;font-weight:1000;padding:16px 22px;font-size:1.2rem}
+.confetti{position:fixed;top:-24px;width:10px;height:22px;z-index:60;animation:fall linear forwards;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes pop{0%{transform:scale(.55);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}@keyframes fall{to{transform:translateY(115vh) rotate(900deg)}}
+@media(max-width:620px){body{padding:0;place-items:start center}.app{min-height:100vh;border-radius:0;border-left:0;border-right:0}header{padding:14px 16px}.logo{width:62px;height:62px}main{padding:16px}.stats,.grid{grid-template-columns:1fr}.sale{min-height:145px}}
+</style>
 </head>
 <body>
-  <section class="app">
-    <header>
-      <h1>🎉 FDF Arnborg Præmiejagt</h1>
-      <p>Tryk én gang for hvert køb, der giver et lod</p>
-    </header>
-
-    <main>
-      <div class="counter">
-        <div class="label">KØB SIDEN SIDSTE GEVINST</div>
-        <div class="number" id="roundCount">0</div>
-        <div class="sub">Næste gevinst udløses tilfældigt</div>
-      </div>
-
-      <button class="sale-btn" id="saleBtn">+ NYT KØB</button>
-
-      <div class="grid">
-        <div class="card">
-          <span>Samlet antal køb</span>
-          <strong id="totalSales">0</strong>
-        </div>
-        <div class="card">
-          <span>Antal gevinster</span>
-          <strong id="totalWins">0</strong>
-        </div>
-      </div>
-
-      <details>
-        <summary>Indstillinger</summary>
-        <div class="settings-row">
-          <label>
-            Minimum køb mellem gevinster
-            <input id="minSales" type="number" min="1" value="15">
-          </label>
-          <label>
-            Maksimum køb mellem gevinster
-            <input id="maxSales" type="number" min="2" value="35">
-          </label>
-        </div>
-        <div class="small-buttons">
-          <button class="save" id="saveSettings">Gem indstillinger</button>
-          <button class="reset" id="resetRound">Nulstil runde</button>
-          <button class="reset" id="resetAll">Nulstil alt</button>
-        </div>
-      </details>
-    </main>
-
-    <footer>
-      Virker offline efter filen er åbnet. Lyd kræver, at enheden ikke er på lydløs.
-    </footer>
-  </section>
-
-  <section class="winner" id="winner">
-    <div class="winner-box">
-      <h2>🎉</h2>
-      <p>DU HAR VUNDET EN PRÆMIE!</p>
-      <button id="closeWinner">Start næste runde</button>
-    </div>
-  </section>
-
-  <script>
-    const roundCountEl = document.getElementById("roundCount");
-    const totalSalesEl = document.getElementById("totalSales");
-    const totalWinsEl = document.getElementById("totalWins");
-    const minSalesEl = document.getElementById("minSales");
-    const maxSalesEl = document.getElementById("maxSales");
-    const winnerEl = document.getElementById("winner");
-
-    let state = JSON.parse(localStorage.getItem("praemiejagtState")) || {
-      roundCount: 0,
-      totalSales: 0,
-      totalWins: 0,
-      minSales: 15,
-      maxSales: 35,
-      target: null
-    };
-
-    function randomTarget(min, max) {
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function ensureTarget() {
-      if (!state.target) {
-        state.target = randomTarget(state.minSales, state.maxSales);
-      }
-    }
-
-    function save() {
-      localStorage.setItem("praemiejagtState", JSON.stringify(state));
-    }
-
-    function render() {
-      roundCountEl.textContent = state.roundCount;
-      totalSalesEl.textContent = state.totalSales;
-      totalWinsEl.textContent = state.totalWins;
-      minSalesEl.value = state.minSales;
-      maxSalesEl.value = state.maxSales;
-      save();
-    }
-
-    function playWinnerSound() {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
-      const notes = [523.25, 659.25, 783.99, 1046.5];
-      notes.forEach((freq, i) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "square";
-        osc.frequency.value = freq;
-        gain.gain.setValueAtTime(0.001, ctx.currentTime + i * 0.15);
-        gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + i * 0.15 + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.28);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(ctx.currentTime + i * 0.15);
-        osc.stop(ctx.currentTime + i * 0.15 + 0.3);
-      });
-    }
-
-    function confetti() {
-      const colors = ["#6b1f7b", "#f2b705", "#ffffff", "#e53935", "#1e88e5", "#43a047"];
-      for (let i = 0; i < 90; i++) {
-        const piece = document.createElement("div");
-        piece.className = "confetti";
-        piece.style.left = Math.random() * 100 + "vw";
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDuration = (2 + Math.random() * 3) + "s";
-        piece.style.animationDelay = (Math.random() * 0.7) + "s";
-        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
-        document.body.appendChild(piece);
-        setTimeout(() => piece.remove(), 6000);
-      }
-    }
-
-    function triggerWinner() {
-      state.totalWins++;
-      save();
-      render();
-      winnerEl.classList.add("show");
-      playWinnerSound();
-      confetti();
-      if (navigator.vibrate) navigator.vibrate([250, 100, 250, 100, 500]);
-    }
-
-    document.getElementById("saleBtn").addEventListener("click", () => {
-      ensureTarget();
-      state.roundCount++;
-      state.totalSales++;
-      render();
-
-      if (state.roundCount >= state.target) {
-        triggerWinner();
-      }
-    });
-
-    document.getElementById("closeWinner").addEventListener("click", () => {
-      state.roundCount = 0;
-      state.target = randomTarget(state.minSales, state.maxSales);
-      winnerEl.classList.remove("show");
-      render();
-    });
-
-    document.getElementById("saveSettings").addEventListener("click", () => {
-      const min = Math.max(1, Number(minSalesEl.value));
-      const max = Math.max(min + 1, Number(maxSalesEl.value));
-      state.minSales = min;
-      state.maxSales = max;
-      state.target = randomTarget(min, max);
-      state.roundCount = 0;
-      render();
-      alert("Indstillinger gemt. Ny runde er startet.");
-    });
-
-    document.getElementById("resetRound").addEventListener("click", () => {
-      state.roundCount = 0;
-      state.target = randomTarget(state.minSales, state.maxSales);
-      render();
-    });
-
-    document.getElementById("resetAll").addEventListener("click", () => {
-      if (!confirm("Vil du nulstille alle køb og gevinster?")) return;
-      state.roundCount = 0;
-      state.totalSales = 0;
-      state.totalWins = 0;
-      state.target = randomTarget(state.minSales, state.maxSales);
-      render();
-    });
-
-    ensureTarget();
-    render();
-  </script>
-</body>
-</html>
+<section class="app">
+<header><img class="logo" src="data:image/png;base64,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" alt="FDF-logo"><div><h1>FDF PRÆMIEJAGT</h1><p class="tag">Seniorfestival · Churros & varm kakao</p></div></header>
+<main>
+<section class="hero"><div class="eyebrow">KØB SIDEN SIDSTE GEVINST</div><div class="count" id="roundCount">0</div><div class="hint">Næste gevinst er skjult og udløses automatisk.</div></section>
+<button class="sale" id="saleBtn">+ NYT KØB</button>
+<div class="stats"><div class="stat"><span>Samlet antal køb</span><strong id="totalSales">0</strong></div><div class="stat"><span>Antal gevinster</span><strong id="totalWins">0</strong></div><div class="stat"><span>Gevinstprocent</span><strong id="winRate">0%</strong></div></div>
+<div class="track"><div class="bar" id="progress"></div></div><div class="message" id="message">Systemet er klar.</div>
+<details><summary>Indstillinger</summary><div class="settings">
+<div class="grid"><label>Minimum køb mellem gevinster<input id="minSales" type="number" min="1" value="15"></label><label>Maksimum køb mellem gevinster<input id="maxSales" type="number" min="2" value="35"></label></div>
+<label>Præmietekst<input id="prizeText" type="text" value="Tillykke – du har vundet en præmie!"></label>
+<label>Lydstyrke<select id="volume"><option value=".12">Lav</option><option value=".25" selected>Mellem</option><option value=".45">Høj</option></select></label>
+<div class="actions"><button class="primary" id="saveSettings">Gem og start ny runde</button><button id="testWinner">Test gevinst</button><button id="resetRound">Nulstil runde</button><button class="danger" id="resetAll">Nulstil alt</button></div>
+</div></details>
+</main><footer>Virker på mobil, tablet og computer. Data gemmes automatisk på enheden.</footer>
+</section>
+<section class="winner" id="winner"><div class="winbox"><img src="data:image/png;base64,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" alt="FDF-logo"><h2>VINDER!</h2><div class="prize" id="winnerPrize"></div><button id="closeWinner">Start næste runde</button></div></section>
+<script>
+(()=>{"use strict";
+const K="fdfPraemiejagtV2",D={roundCount:0,totalSales:0,totalWins:0,minSales:15,maxSales:35,target:null,prizeText:"Tillykke – du har vundet en præmie!",volume:.25};
+const $=id=>document.getElementById(id),E={round:$("roundCount"),sales:$("totalSales"),wins:$("totalWins"),rate:$("winRate"),sale:$("saleBtn"),min:$("minSales"),max:$("maxSales"),text:$("prizeText"),vol:$("volume"),bar:$("progress"),msg:$("message"),winner:$("winner"),winText:$("winnerPrize")};
+let S;try{S={...D,...JSON.parse(localStorage.getItem(K)||"{}")}}catch{S={...D}}let open=false;
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;function target(){if(!Number.isFinite(S.target)||S.target<1)S.target=rnd(S.minSales,S.maxSales)}
+function save(){localStorage.setItem(K,JSON.stringify(S))}
+function render(){target();E.round.textContent=S.roundCount;E.sales.textContent=S.totalSales;E.wins.textContent=S.totalWins;E.rate.textContent=(S.totalSales?(S.totalWins/S.totalSales*100).toFixed(1):0)+"%";E.min.value=S.minSales;E.max.value=S.maxSales;E.text.value=S.prizeText;E.vol.value=String(S.volume);E.bar.style.width=Math.min(100,S.roundCount/S.target*100)+"%";E.msg.textContent=S.target-S.roundCount<=3?"Der kan komme en gevinst når som helst.":"Systemet er klar.";save()}
+function next(){S.roundCount=0;S.target=rnd(S.minSales,S.maxSales);render()}
+function sound(){const A=window.AudioContext||window.webkitAudioContext;if(!A)return;const c=new A(),notes=[392,523.25,659.25,783.99,1046.5];notes.forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+i*.13;o.type=i%2?"sawtooth":"square";o.frequency.value=f;g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(S.volume,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+.28);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.3)});setTimeout(()=>c.close(),1500)}
+function confetti(){let colors=["#fff","#bbb","#555","#000","#d2ad47"];for(let i=0;i<110;i++){let p=document.createElement("div");p.className="confetti";p.style.left=Math.random()*100+"vw";p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=2.2+Math.random()*2.8+"s";p.style.animationDelay=Math.random()*.7+"s";document.body.appendChild(p);setTimeout(()=>p.remove(),6000)}}
+function win(count=true){if(open)return;open=true;if(count)S.totalWins++;E.winText.textContent=S.prizeText;E.winner.classList.add("show");sound();confetti();navigator.vibrate?.([250,120,250,120,600]);render()}
+function register(){if(open)return;target();S.roundCount++;S.totalSales++;S.roundCount>=S.target?win(true):render()}
+E.sale.onclick=register;$("closeWinner").onclick=()=>{open=false;E.winner.classList.remove("show");next()};
+$("saveSettings").onclick=()=>{let a=Math.max(1,+E.min.value||1),b=Math.max(a+1,+E.max.value||a+1);S.minSales=a;S.maxSales=b;S.prizeText=E.text.value.trim()||D.prizeText;S.volume=+E.vol.value||D.volume;next();alert("Indstillingerne er gemt, og en ny runde er startet.")};
+$("testWinner").onclick=()=>{S.prizeText=E.text.value.trim()||D.prizeText;S.volume=+E.vol.value||D.volume;win(false)};
+$("resetRound").onclick=()=>confirm("Vil du nulstille den aktuelle runde?")&&next();
+$("resetAll").onclick=()=>{if(confirm("Vil du nulstille alle køb, gevinster og indstillinger?")){S={...D};next()}};
+document.addEventListener("keydown",e=>{if(e.code==="Space"&&!open){e.preventDefault();register()}if(e.code==="Escape"&&open)$("closeWinner").click()});render();
+})();
+</script>
+</body></html>
