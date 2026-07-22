@@ -226,6 +226,93 @@ input,select{
 .pin-actions button{border:2px solid #000;border-radius:12px;padding:11px 16px;background:#fff;font-weight:900;cursor:pointer}
 .pin-actions .primary{background:#000;color:#fff}
 
+
+.main-prize-banner{
+  margin-bottom:18px;
+  border:3px solid #000;
+  border-radius:24px;
+  padding:20px;
+  text-align:center;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(216,178,76,.24),transparent 32%),
+    radial-gradient(circle at 80% 80%,rgba(216,178,76,.18),transparent 34%),
+    #fff;
+  box-shadow:0 8px 0 #000;
+}
+.main-prize-kicker{
+  display:inline-block;
+  background:#000;color:#fff;
+  border-radius:999px;
+  padding:7px 14px;
+  font-weight:1000;
+  letter-spacing:.13em;
+  font-size:.78rem;
+}
+.main-prize-title{
+  margin-top:14px;
+  font-size:clamp(1.55rem,5vw,2.5rem);
+  font-weight:1000;
+}
+.main-prize-value{
+  font-size:clamp(3rem,11vw,5.8rem);
+  line-height:.95;
+  font-weight:1000;
+  color:#000;
+  margin:5px 0 12px;
+}
+.main-prize-note{
+  max-width:600px;
+  margin:auto;
+  color:#555;
+  font-weight:750;
+  line-height:1.45;
+}
+.prize-editor{
+  border:2px solid #000;
+  border-radius:16px;
+  padding:14px;
+  background:#fff;
+}
+.prize-editor h3{margin:0 0 6px}
+.prize-editor p{margin:0 0 12px;color:#666;font-weight:700;font-size:.9rem}
+.prize-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 105px auto;
+  gap:8px;
+  align-items:end;
+  margin-top:9px;
+}
+.prize-row button{
+  border:2px solid #a0001a;
+  color:#a0001a;
+  background:#fff;
+  border-radius:10px;
+  min-height:46px;
+  padding:8px 11px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.add-prize{
+  margin-top:10px;
+  border:2px dashed #000;
+  border-radius:12px;
+  padding:11px 14px;
+  width:100%;
+  background:#f7f7f7;
+  font-weight:1000;
+  cursor:pointer;
+}
+.stock-summary{
+  margin-top:10px;
+  color:#555;
+  font-weight:800;
+  font-size:.9rem;
+}
+@media(max-width:640px){
+  .prize-row{grid-template-columns:1fr 88px}
+  .prize-row button{grid-column:1/-1}
+}
+
 @media(max-width:640px){
   body{padding:0;place-items:start center}
   .app{min-height:100vh;border-radius:0;border-left:0;border-right:0}
@@ -253,6 +340,16 @@ input,select{
   </header>
 
   <main>
+
+<section class="main-prize-banner" aria-label="Hovedpræmie">
+  <div class="main-prize-kicker">HOVEDPRÆMIE</div>
+  <div class="main-prize-title">Gavekort til Eventyrsport</div>
+  <div class="main-prize-value">400 kr.</div>
+  <div class="main-prize-note">
+    Udfyld en fysisk lodseddel med navn og telefonnummer.
+    Hovedpræmien trækkes manuelt ved arrangementets afslutning.
+  </div>
+</section>
     <section class="hero">
       <div class="eyebrow">KØB SIDEN SIDSTE GEVINST</div>
       <div class="count" id="roundCount">0</div>
@@ -287,7 +384,16 @@ input,select{
         </label>
       </div>
 
-      <label>Præmietekst
+
+      <div class="prize-editor">
+        <h3>Øjeblikkelige præmier</h3>
+        <p>Generatoren vælger tilfældigt blandt præmier, der stadig er på lager.</p>
+        <div id="prizeRows"></div>
+        <button class="add-prize" id="addPrize" type="button">+ Tilføj præmie</button>
+        <div class="stock-summary" id="stockSummary"></div>
+      </div>
+
+      <label>Standardtekst ved tomt præmielager
         <input id="prizeText" type="text" value="Tillykke – du har vundet en præmie!">
       </label>
 
@@ -316,7 +422,7 @@ input,select{
   </main>
 
   <div class="footer">
-    Vinderoplysninger gemmes kun lokalt på denne enhed. Eksportér listen og slet den, når I ikke længere har brug for oplysningerne.
+    Øjeblikkelige præmier vælges tilfældigt fra præmielageret. Hovedpræmien på 400 kr. trækkes manuelt blandt de fysiske lodsedler.
   </div>
 </section>
 
@@ -392,7 +498,12 @@ input,select{
     maxSales: 35,
     target: null,
     prizeText: "Tillykke – du har vundet en præmie!",
-    volume: 0.22
+    volume: 0.22,
+    prizes: [
+      { id: "p1", name: "Gratis churros", remaining: 20 },
+      { id: "p2", name: "Gratis varm kakao", remaining: 15 },
+      { id: "p3", name: "Churros og varm kakao", remaining: 8 }
+    ]
   };
 
   const $ = id => document.getElementById(id);
@@ -418,12 +529,24 @@ input,select{
     pinModal: $("pinModal"),
     pinInput: $("pinInput"),
     pinError: $("pinError"),
+    prizeRows: $("prizeRows"),
+    stockSummary: $("stockSummary"),
     winLogoLeft: $("winLogoLeft"),
     winLogoRight: $("winLogoRight")
   };
 
   let state = loadJson(STATE_KEY, defaults);
   let winners = loadJson(WINNERS_KEY, []);
+
+  if (!Array.isArray(state.prizes)) {
+    state.prizes = structuredClone(defaults.prizes);
+  }
+  state.prizes = state.prizes.map((p, index) => ({
+    id: p.id || `p${Date.now()}-${index}`,
+    name: String(p.name || "Præmie"),
+    remaining: Math.max(0, Number(p.remaining) || 0)
+  }));
+  let currentPrize = null;
   let winnerOpen = false;
 
   function loadJson(key, fallback) {
@@ -452,6 +575,65 @@ input,select{
     }
   }
 
+
+  function totalPrizeStock() {
+    return state.prizes.reduce((sum, prize) => sum + Math.max(0, Number(prize.remaining) || 0), 0);
+  }
+
+  function selectRandomPrize() {
+    const available = state.prizes.filter(prize => Number(prize.remaining) > 0);
+    const total = available.reduce((sum, prize) => sum + Number(prize.remaining), 0);
+    if (!total) return null;
+
+    let ticket = Math.floor(Math.random() * total) + 1;
+    for (const prize of available) {
+      ticket -= Number(prize.remaining);
+      if (ticket <= 0) return prize;
+    }
+    return available[available.length - 1] || null;
+  }
+
+  function renderPrizeEditor() {
+    if (!el.prizeRows) return;
+    el.prizeRows.innerHTML = "";
+
+    state.prizes.forEach((prize, index) => {
+      const row = document.createElement("div");
+      row.className = "prize-row";
+      row.innerHTML = `
+        <label>Præmie
+          <input class="prize-name" data-index="${index}" type="text" value="${escapeHtml(prize.name)}">
+        </label>
+        <label>Antal tilbage
+          <input class="prize-count" data-index="${index}" type="number" min="0" value="${prize.remaining}">
+        </label>
+        <button type="button" class="remove-prize" data-index="${index}">Slet</button>
+      `;
+      el.prizeRows.appendChild(row);
+    });
+
+    el.stockSummary.textContent = `Samlet præmielager: ${totalPrizeStock()} stk.`;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
+
+  function readPrizeEditor() {
+    const names = [...document.querySelectorAll(".prize-name")];
+    const counts = [...document.querySelectorAll(".prize-count")];
+
+    state.prizes = names.map((input, index) => ({
+      id: state.prizes[index]?.id || `p${Date.now()}-${index}`,
+      name: input.value.trim() || `Præmie ${index + 1}`,
+      remaining: Math.max(0, Number(counts[index]?.value) || 0)
+    }));
+  }
+
   function render() {
     ensureTarget();
 
@@ -464,6 +646,8 @@ input,select{
     el.maxSales.value = state.maxSales;
     el.prizeText.value = state.prizeText;
     el.volume.value = String(state.volume);
+
+    renderPrizeEditor();
 
     el.winnerListInfo.textContent = winners.length
       ? `${winners.length} vinder${winners.length === 1 ? "" : "e"} er gemt på denne enhed.`
@@ -551,10 +735,20 @@ input,select{
     if (winnerOpen) return;
     winnerOpen = true;
 
-    if (countWin) state.totalWins += 1;
+    if (countWin) {
+      currentPrize = selectRandomPrize();
+      if (currentPrize) {
+        currentPrize.remaining -= 1;
+      }
+      state.totalWins += 1;
+    } else {
+      currentPrize = selectRandomPrize();
+    }
 
     clearWinnerForm();
-    el.winnerPrize.textContent = state.prizeText;
+    el.winnerPrize.textContent = currentPrize
+      ? `Du har vundet: ${currentPrize.name}`
+      : state.prizeText;
     el.winner.classList.add("show");
     el.winLogoLeft.classList.add("flash");
     el.winLogoRight.classList.add("flash");
@@ -568,6 +762,7 @@ input,select{
   }
 
   function closeWinnerAndContinue() {
+    currentPrize = null;
     winnerOpen = false;
     el.winner.classList.remove("show");
     el.winLogoLeft.classList.remove("flash");
@@ -646,7 +841,7 @@ input,select{
       name,
       phone,
       email,
-      prize: state.prizeText,
+      prize: currentPrize ? currentPrize.name : state.prizeText,
       timestamp: new Date().toISOString()
     });
 
@@ -688,6 +883,31 @@ input,select{
   }
 
 
+
+  $("addPrize").addEventListener("click", () => {
+    readPrizeEditor();
+    state.prizes.push({
+      id: `p${Date.now()}`,
+      name: "Ny præmie",
+      remaining: 1
+    });
+    renderPrizeEditor();
+  });
+
+  el.prizeRows.addEventListener("click", event => {
+    const button = event.target.closest(".remove-prize");
+    if (!button) return;
+    readPrizeEditor();
+    const index = Number(button.dataset.index);
+    state.prizes.splice(index, 1);
+    renderPrizeEditor();
+  });
+
+  el.prizeRows.addEventListener("input", () => {
+    readPrizeEditor();
+    el.stockSummary.textContent = `Samlet præmielager: ${totalPrizeStock()} stk.`;
+  });
+
   $("openAdmin").addEventListener("click", openPinModal);
   $("pinCancel").addEventListener("click", closePinModal);
   $("pinSubmit").addEventListener("click", unlockAdmin);
@@ -708,6 +928,7 @@ input,select{
     const min = Math.max(1, Number(el.minSales.value) || 1);
     const max = Math.max(min + 1, Number(el.maxSales.value) || min + 1);
 
+    readPrizeEditor();
     state.minSales = min;
     state.maxSales = max;
     state.prizeText = el.prizeText.value.trim() || defaults.prizeText;
