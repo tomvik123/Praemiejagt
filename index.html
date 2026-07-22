@@ -208,6 +208,24 @@ input,select{
 @keyframes pop{0%{transform:scale(.55);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
 @keyframes fall{to{transform:translateY(115vh) rotate(900deg)}}
 @keyframes logoFlash{0%,100%{filter:none;transform:scale(1)}50%{filter:brightness(2);transform:scale(1.08)}}
+
+.admin-zone{margin-top:22px;border-top:2px solid #000;padding-top:18px}
+.admin-open{width:100%;border:2px solid #000;border-radius:14px;padding:14px 16px;background:#000;color:#fff;font-weight:1000;cursor:pointer}
+.admin-panel{margin-top:14px;border:2px solid #000;border-radius:18px;padding:16px;background:#fafafa}
+.admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.admin-head h2{margin:0;font-size:1.2rem}
+.admin-lock{border:2px solid #000;border-radius:10px;padding:9px 12px;background:#fff;font-weight:900;cursor:pointer}
+.pin-modal{position:fixed;inset:0;display:none;place-items:center;z-index:1200;background:rgba(0,0,0,.82);padding:20px}
+.pin-modal.show{display:grid}
+.pin-card{width:min(420px,100%);background:#fff;color:#000;border:4px solid #000;border-radius:24px;padding:24px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.pin-card h2{margin:0 0 8px}
+.pin-card p{margin:0 0 16px;color:#666;font-weight:700}
+.pin-card input{font-size:2rem;text-align:center;letter-spacing:.35em;padding-left:.35em}
+.pin-error{min-height:1.4em;color:#a0001a;font-weight:900;margin-top:8px}
+.pin-actions{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.pin-actions button{border:2px solid #000;border-radius:12px;padding:11px 16px;background:#fff;font-weight:900;cursor:pointer}
+.pin-actions .primary{background:#000;color:#fff}
+
 @media(max-width:640px){
   body{padding:0;place-items:start center}
   .app{min-height:100vh;border-radius:0;border-left:0;border-right:0}
@@ -238,7 +256,7 @@ input,select{
     <section class="hero">
       <div class="eyebrow">KØB SIDEN SIDSTE GEVINST</div>
       <div class="count" id="roundCount">0</div>
-      <div class="hint">Gevinsten udløses ved et skjult, tilfældigt antal forsøg.</div>
+      <div class="hint">Præmien udløses tilfældigt.</div>
     </section>
 
     <button class="luck-btn" id="luckBtn" aria-label="Prøv lykken">🍀 PRØV LYKKEN 🍀</button>
@@ -249,49 +267,70 @@ input,select{
       <div class="stat"><span>Registrerede vindere</span><strong id="savedWinners">0</strong></div>
     </div>
 
-    <div class="track"><div class="bar" id="progress"></div></div>
-    <div class="message" id="message">Systemet er klar.</div>
+    
+<section class="admin-zone">
+  <button class="admin-open" id="openAdmin">🔒 Åbn admin-panel</button>
 
-    <details>
-      <summary>Indstillinger og vinderliste</summary>
-      <div class="settings">
-        <div class="settings-grid">
-          <label>Minimum forsøg mellem gevinster
-            <input id="minSales" type="number" min="1" value="15">
-          </label>
-          <label>Maksimum forsøg mellem gevinster
-            <input id="maxSales" type="number" min="2" value="35">
-          </label>
-        </div>
+  <div class="admin-panel" id="adminPanel" hidden>
+    <div class="admin-head">
+      <h2>Admin-panel</h2>
+      <button id="lockAdmin" class="admin-lock">Lås panel</button>
+    </div>
 
-        <label>Præmietekst
-          <input id="prizeText" type="text" value="Tillykke – du har vundet en præmie!">
+    <div class="settings">
+      <div class="settings-grid">
+        <label>Minimum forsøg mellem gevinster
+          <input id="minSales" type="number" min="1" value="15">
         </label>
-
-        <label>Lydstyrke
-          <select id="volume">
-            <option value="0.10">Lav</option>
-            <option value="0.22" selected>Mellem</option>
-            <option value="0.38">Høj</option>
-          </select>
+        <label>Maksimum forsøg mellem gevinster
+          <input id="maxSales" type="number" min="2" value="35">
         </label>
-
-        <div class="actions">
-          <button class="primary" id="saveSettings">Gem og start ny runde</button>
-          <button id="testWinner">Test gevinst</button>
-          <button id="exportWinners">Eksportér vinderliste</button>
-          <button id="resetRound">Nulstil runde</button>
-          <button class="danger" id="clearWinners">Slet vinderliste</button>
-          <button class="danger" id="resetAll">Nulstil alt</button>
-        </div>
-
-        <div class="winner-list" id="winnerListInfo">Ingen vindere er registreret endnu.</div>
       </div>
-    </details>
+
+      <label>Præmietekst
+        <input id="prizeText" type="text" value="Tillykke – du har vundet en præmie!">
+      </label>
+
+      <label>Lydstyrke
+        <select id="volume">
+          <option value="0.10">Lav</option>
+          <option value="0.22" selected>Mellem</option>
+          <option value="0.38">Høj</option>
+        </select>
+      </label>
+
+      <div class="actions">
+        <button class="primary" id="saveSettings">Gem og start ny runde</button>
+        <button id="testWinner">Test gevinst</button>
+        <button id="exportWinners">Eksportér vinderliste</button>
+        <button id="resetRound">Nulstil runde</button>
+        <button class="danger" id="clearWinners">Slet vinderliste</button>
+        <button class="danger" id="resetAll">Nulstil alt</button>
+      </div>
+
+      <div class="winner-list" id="winnerListInfo">Ingen vindere er registreret endnu.</div>
+    </div>
+  </div>
+</section>
+
   </main>
 
   <div class="footer">
     Vinderoplysninger gemmes kun lokalt på denne enhed. Eksportér listen og slet den, når I ikke længere har brug for oplysningerne.
+  </div>
+</section>
+
+
+<section class="pin-modal" id="pinModal" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+  <div class="pin-card">
+    <h2 id="pinTitle">Admin-adgang</h2>
+    <p>Indtast den 4-cifrede kode.</p>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="4" autocomplete="off" aria-label="Admin-kode">
+    <div class="pin-error" id="pinError"></div>
+    <div class="pin-actions">
+      <button id="pinCancel">Annuller</button>
+      <button id="pinSubmit" class="primary">Lås op</button>
+    </div>
   </div>
 </section>
 
@@ -342,6 +381,7 @@ input,select{
   "use strict";
 
   const STATE_KEY = "fdfPraemiejagtV3";
+  const ADMIN_PIN = "7400";
   const WINNERS_KEY = "fdfPraemiejagtV3Winners";
 
   const defaults = {
@@ -365,8 +405,6 @@ input,select{
     maxSales: $("maxSales"),
     prizeText: $("prizeText"),
     volume: $("volume"),
-    progress: $("progress"),
-    message: $("message"),
     luckBtn: $("luckBtn"),
     winner: $("winner"),
     winnerPrize: $("winnerPrize"),
@@ -376,6 +414,10 @@ input,select{
     winnerConsent: $("winnerConsent"),
     formError: $("formError"),
     winnerListInfo: $("winnerListInfo"),
+    adminPanel: $("adminPanel"),
+    pinModal: $("pinModal"),
+    pinInput: $("pinInput"),
+    pinError: $("pinError"),
     winLogoLeft: $("winLogoLeft"),
     winLogoRight: $("winLogoRight")
   };
@@ -422,14 +464,6 @@ input,select{
     el.maxSales.value = state.maxSales;
     el.prizeText.value = state.prizeText;
     el.volume.value = String(state.volume);
-
-    const percent = Math.min(100, (state.roundCount / state.target) * 100);
-    el.progress.style.width = percent + "%";
-
-    const remaining = Math.max(0, state.target - state.roundCount);
-    el.message.textContent = remaining <= 3
-      ? "Der kan komme en gevinst når som helst."
-      : "Systemet er klar.";
 
     el.winnerListInfo.textContent = winners.length
       ? `${winners.length} vinder${winners.length === 1 ? "" : "e"} er gemt på denne enhed.`
@@ -541,6 +575,37 @@ input,select{
     startNewRound();
   }
 
+
+  function openPinModal() {
+    el.pinInput.value = "";
+    el.pinError.textContent = "";
+    el.pinModal.classList.add("show");
+    setTimeout(() => el.pinInput.focus(), 100);
+  }
+
+  function closePinModal() {
+    el.pinModal.classList.remove("show");
+    el.pinInput.value = "";
+    el.pinError.textContent = "";
+  }
+
+  function unlockAdmin() {
+    if (el.pinInput.value === ADMIN_PIN) {
+      closePinModal();
+      el.adminPanel.hidden = false;
+      $("openAdmin").hidden = true;
+      setTimeout(() => el.adminPanel.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    } else {
+      el.pinError.textContent = "Forkert kode.";
+      el.pinInput.select();
+    }
+  }
+
+  function lockAdmin() {
+    el.adminPanel.hidden = true;
+    $("openAdmin").hidden = false;
+  }
+
   function registerAttempt() {
     if (winnerOpen) return;
 
@@ -621,6 +686,19 @@ input,select{
     a.remove();
     URL.revokeObjectURL(url);
   }
+
+
+  $("openAdmin").addEventListener("click", openPinModal);
+  $("pinCancel").addEventListener("click", closePinModal);
+  $("pinSubmit").addEventListener("click", unlockAdmin);
+  $("lockAdmin").addEventListener("click", lockAdmin);
+  el.pinInput.addEventListener("keydown", event => {
+    if (event.key === "Enter") unlockAdmin();
+    if (event.key === "Escape") closePinModal();
+  });
+  el.pinModal.addEventListener("click", event => {
+    if (event.target === el.pinModal) closePinModal();
+  });
 
   el.luckBtn.addEventListener("click", registerAttempt);
   $("saveWinner").addEventListener("click", saveWinner);
